@@ -4,13 +4,12 @@ class Obj {
     // Inicia la connexió amb la base de dades
     init(parameters) {
         this.pool = mysql.createPool({
-            cost: '127.0.0.1',
-            port: 3306,
-            user: 'root',
-            password: 'mysqlocal',
-            database: 'sakila'
-  });
-}
+            connectionLimit: 10,
+            host: parameters.host,
+            port: parameters.port,
+            user: parameters.user,
+            password: parameters.password,
+            database: parameters.database
         })
         
         this.pool.on('connection', (connection) => {

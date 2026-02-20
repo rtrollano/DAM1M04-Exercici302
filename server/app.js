@@ -17,16 +17,16 @@ if (!isProxmox) {
     host: '127.0.0.1',
     port: 3306,
     user: 'root',
-    password: 'root',
-    database: 'escola'
+    password: 'mysqlocal',
+    database: 'sakila'
   });
 } else {
   db.init({
     host: '127.0.0.1',
     port: 3306,
-    user: 'super',
-    password: '1234',
-    database: 'escola'
+    user: 'root',
+    password: 'mysqlocal',
+    database: 'sakila'
   });
 }
 
@@ -58,13 +58,13 @@ hbs.registerPartials(path.join(__dirname, 'views', 'partials'));
 app.get('/', async (req, res) => {
   try {
     // Obtenir les dades de la base de dades
-    const cursosRows = await db.query('SELECT id, nom, tematica FROM cursos ORDER BY id');
-    const especialitatsRows = await db.query('SELECT id, nom FROM especialitats ORDER BY nom');
+    const moviesRows = await db.query('select f.film_id as id, f.title as titol, f.release_year as any from film f limit 5');
+    const customersRows = await db.query('select c.customer_id as id, c.first_name as nom, c.last_name as cognom from customer c limit 5');
 
     // Transformar les dades a JSON (per les plantilles .hbs)
     // Cal informar de les columnes i els seus tipus
-    const cursosJson = db.table_to_json(cursosRows, { id: 'number', nom: 'string', tematica: 'string' });
-    const especialitatsJson = db.table_to_json(especialitatsRows, { id: 'number', nom: 'string' });
+    const moviesJson = db.table_to_json(moviesRows, { id: 'number', titol: 'string', any: 'number' });
+    const customersJson = db.table_to_json(customersRows, { id: 'number', nom: 'string', cognom: 'string' });
 
     // Llegir l'arxiu .json amb dades comunes per a totes les pàgines
     const commonData = JSON.parse(
@@ -73,8 +73,8 @@ app.get('/', async (req, res) => {
 
     // Construir l'objecte de dades per a la plantilla
     const data = {
-      cursos: cursosJson,
-      especialitats: especialitatsJson,
+      movies: moviesJson,
+      customers: customersJson,
       common: commonData
     };
 
@@ -90,28 +90,15 @@ app.get('/movies', async (req, res) => {
   try {
 
     // Obtenir les dades de la base de dades
-    const cursosRows = await db.query(`
-      SELECT
-        c.id,
-        c.nom,
-        c.tematica,
-        COALESCE(
-          GROUP_CONCAT(DISTINCT m.nom ORDER BY m.nom SEPARATOR ', '),
-          '—'
-        ) AS mestre_nom
-      FROM cursos c
-      LEFT JOIN mestre_curs mc ON mc.curs_id = c.id
-      LEFT JOIN mestres m ON m.id = mc.mestre_id
-      GROUP BY c.id, c.nom, c.tematica
-      ORDER BY c.id;
+    const moviesRows = await db.query(`
+      select f.film_id as id, f.title as titol, f.release_year as any from film f limit 5;
     `);
 
     // Transformar les dades a JSON (per les plantilles .hbs)
-    const cursosJson = db.table_to_json(cursosRows, {
+    const moviesJson = db.table_to_json(moviesRows, {
       id: 'number',
-      nom: 'string',
-      tematica: 'string',
-      mestre_nom: 'string'
+      titol: 'string',
+      any: 'number'
     });
 
     // Llegir l'arxiu .json amb dades comunes per a totes les pàgines
@@ -121,15 +108,15 @@ app.get('/movies', async (req, res) => {
 
     // Construir l'objecte de dades per a la plantilla
     const data = {
-      cursos: cursosJson,
+      movies: moviesJson,
       common: commonData
     };
 
     // Renderitzar la plantilla amb les dades
-    res.render('cursos', data);
+    res.render('movies', data);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error consultant la base de dades');
+    res.status(500).send('Error consultant la base de dades per movies');
   }
 });
 
@@ -137,28 +124,15 @@ app.get('/customers', async (req, res) => {
   try {
 
     // Obtenir les dades de la base de dades
-    const cursosRows = await db.query(`
-      SELECT
-        c.id,
-        c.nom,
-        c.tematica,
-        COALESCE(
-          GROUP_CONCAT(DISTINCT m.nom ORDER BY m.nom SEPARATOR ', '),
-          '—'
-        ) AS mestre_nom
-      FROM cursos c
-      LEFT JOIN mestre_curs mc ON mc.curs_id = c.id
-      LEFT JOIN mestres m ON m.id = mc.mestre_id
-      GROUP BY c.id, c.nom, c.tematica
-      ORDER BY c.id;
+    const customersRows = await db.query(`
+      select c.customer_id as id, c.first_name as nom, c.last_name as cognom from customer c limit 5;
     `);
 
     // Transformar les dades a JSON (per les plantilles .hbs)
-    const cursosJson = db.table_to_json(cursosRows, {
+    const customersJson = db.table_to_json(customersRows, {
       id: 'number',
       nom: 'string',
-      tematica: 'string',
-      mestre_nom: 'string'
+      cognom: 'string'
     });
 
     // Llegir l'arxiu .json amb dades comunes per a totes les pàgines
@@ -168,24 +142,24 @@ app.get('/customers', async (req, res) => {
 
     // Construir l'objecte de dades per a la plantilla
     const data = {
-      cursos: cursosJson,
+      customers: customersJson,
       common: commonData
     };
 
     // Renderitzar la plantilla amb les dades
-    res.render('cursos', data);
+    res.render('customers', data);
   } catch (err) {
     console.error(err);
-    res.status(500).send('Error consultant la base de dades');
+    res.status(500).send('Error consultant la base de dades per Customers');
   }
 });
+
 
 // Start server
 const httpServer = app.listen(port, () => {
   console.log(`http://localhost:${port}`);
   console.log(`http://localhost:${port}/movies`);
-  console.log(`http://localhost:${port}/customers`);
-
+    console.log(`http://localhost:${port}/customers`);
 });
 
 // Graceful shutdown

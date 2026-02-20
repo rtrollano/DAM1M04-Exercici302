@@ -2,31 +2,31 @@
 <html lang="ca">
 <head>
   {{> header}}
-  <title>Cursos</title>
+  <title>Clients</title>
 </head>
 <body>
   {{> menu}}
 
   <main class="container">
-    <h1>Cursos</h1>
+    <h1>Clients</h1>
 
     <p>Informació actualitzada de la base de dades</p>
 
     <table class="table">
       <thead>
         <tr>
-          <th>Curs</th>
-          <th>Temàtica</th>
-          <th>Mestre</th>
+          <th>Id</th>
+          <th>Nom</th>
+          <th>Cognom</th>
         </tr>
       </thead>
 
       <tbody>
-        {{#each cursos}}
+        {{#each customers}}
           <tr>
+            <td>{{id}}</td>
             <td>{{nom}}</td>
-            <td>{{tematica}}</td>
-            <td>{{mestre_nom}}</td>
+            <td>{{cognom}}</td>
           </tr>
         {{/each}}
       </tbody>

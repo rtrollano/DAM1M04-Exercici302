@@ -3,33 +3,33 @@
 <head>
   {{> header}}
   <link rel="stylesheet" href="index.css">
-  <title>Escola programació</title>
+  <title>DAM1M04-Exercici302-MySQL</title>
 </head>
 <body>
   {{> menu}}
 
   <main class="container">
-    <h1>Escola de programació</h1>
+    <h1>DAM1M04-Exercici302-MySQL</h1>
 
     <section class="cols-2">
       <article class="card">
-        <h2>Cursos</h2>
+        <h2>Consultes a BBDD</h2>
 
         <ul class="list">
-          {{#each cursos}}
+          {{#each movies}}
             <li class="list-item">
-              <strong>{{nom}}</strong><br>
-              <span class="muted">{{tematica}}</span>
+              <strong>{{titol}}</strong><br>
+              <span class="muted">{{any}}</span>
             </li>
           {{/each}}
         </ul>
       </article>
 
       <article class="card">
-        <h2>Especialitats</h2>
+        <h2>Clients</h2>
 
         <ul class="list">
-          {{#each especialitats}}
+          {{#each customers}}
             <li class="list-item">
               {{nom}}
             </li>
