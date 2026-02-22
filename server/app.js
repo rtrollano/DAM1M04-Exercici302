@@ -58,13 +58,20 @@ hbs.registerPartials(path.join(__dirname, 'views', 'partials'));
 app.get('/', async (req, res) => {
   try {
     // Obtenir les dades de la base de dades
-    const moviesRows = await db.query('select f.film_id as id, f.title as titol, f.release_year as any from film f limit 5');
-    const customersRows = await db.query('select c.customer_id as id, c.first_name as nom, c.last_name as cognom from customer c limit 5');
+
+    const moviesRows = await db.query(`select f.title as Titol, f.film_id as Id, f.release_year as Any, group_concat(concat(a.first_name, ' ', a.last_name) separator ', ') as Actors
+                                        from film f
+                                        join film_actor fa on f.film_id = fa.film_id
+                                        join actor a on a.actor_id = fa.actor_id
+                                        group by f.film_id, f.title, f.release_year
+                                        order by f.title
+                                        limit 5`);
+    const categoriesRows = await db.query('select category_id as id, name from category limit 5');
 
     // Transformar les dades a JSON (per les plantilles .hbs)
     // Cal informar de les columnes i els seus tipus
     const moviesJson = db.table_to_json(moviesRows, { id: 'number', titol: 'string', any: 'number' });
-    const customersJson = db.table_to_json(customersRows, { id: 'number', nom: 'string', cognom: 'string' });
+    const categoriesJson = db.table_to_json(categoriesRows, { id: 'number', name: 'string' });
 
     // Llegir l'arxiu .json amb dades comunes per a totes les pàgines
     const commonData = JSON.parse(
@@ -74,7 +81,7 @@ app.get('/', async (req, res) => {
     // Construir l'objecte de dades per a la plantilla
     const data = {
       movies: moviesJson,
-      customers: customersJson,
+      categories: categoriesJson,
       common: commonData
     };
 
@@ -90,16 +97,16 @@ app.get('/movies', async (req, res) => {
   try {
 
     // Obtenir les dades de la base de dades
-    const moviesRows = await db.query(`
-      select f.film_id as id, f.title as titol, f.release_year as any from film f limit 5;
-    `);
+    const moviesRows = await db.query(`select f.title as Titol, f.film_id as Id, f.release_year as Any, group_concat(concat(a.first_name, ' ', a.last_name) separator ', ') as Actors
+                                        from film f
+                                        join film_actor fa on f.film_id = fa.film_id
+                                        join actor a on a.actor_id = fa.actor_id
+                                        group by f.film_id, f.title, f.release_year
+                                        order by f.title
+                                        limit 15`);
 
     // Transformar les dades a JSON (per les plantilles .hbs)
-    const moviesJson = db.table_to_json(moviesRows, {
-      id: 'number',
-      titol: 'string',
-      any: 'number'
-    });
+    const moviesJson = db.table_to_json(moviesRows, {Titol: 'string',id: 'number',any: 'number', Actors: 'string'});
 
     // Llegir l'arxiu .json amb dades comunes per a totes les pàgines
     const commonData = JSON.parse(
@@ -125,14 +132,35 @@ app.get('/customers', async (req, res) => {
 
     // Obtenir les dades de la base de dades
     const customersRows = await db.query(`
-      select c.customer_id as id, c.first_name as nom, c.last_name as cognom from customer c limit 5;
-    `);
+        select 
+            Nom_Client,
+            group_concat(Titol separator ' ; ') as Titol,
+            group_concat(Data_Lloguer separator ' ; ') as Data_Lloguer
+        from (
+            select 
+                concat(c.first_name, ' ', c.last_name) as Nom_Client,
+                f.title as Titol,
+                r.rental_date as Data_Lloguer,
+                row_number() over (
+                    partition by c.customer_id 
+                    order by r.rental_date
+                ) as rownumber
+            from customer c
+            join rental r on c.customer_id = r.customer_id
+            join inventory i on r.inventory_id = i.inventory_id
+            join film f on f.film_id = i.film_id
+        ) t
+        where rownumber <= 5
+        group by Nom_Client
+        order by Nom_Client
+        limit 25;
+      `);
 
     // Transformar les dades a JSON (per les plantilles .hbs)
     const customersJson = db.table_to_json(customersRows, {
-      id: 'number',
-      nom: 'string',
-      cognom: 'string'
+      Nom_client: 'string',
+      Titol: 'string',
+      Data_Lloguer: 'string'
     });
 
     // Llegir l'arxiu .json amb dades comunes per a totes les pàgines

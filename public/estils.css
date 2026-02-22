@@ -1,10 +1,15 @@
 body {
     font-family: Roboto;
     font-size: 1.1em;
+    background-image: url("./imatges/blockbuster.jpeg");
+    background-size: cover;
+    color: white;
 }
 
 table {
   border-collapse: collapse;
+  color: black;
+
 }
 
 th, td {
@@ -41,12 +46,12 @@ nav ul {
 a,
 a:link,
 a:visited {
-  color: #1083e7;
+  color: yellow;
   text-decoration: none;
 }
 
 a:hover {
-  color: #2563eb;
+  color: white;
   text-decoration: underline;
 }
 

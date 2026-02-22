@@ -9,32 +9,51 @@
   {{> menu}}
 
   <main class="container">
-    <h1>DAM1M04-Exercici302-MySQL</h1>
+    <h1>DAM1M04-Exercici302 MySQL-Consultes a BBDD</h1>
 
     <section class="cols-2">
       <article class="card">
-        <h2>Consultes a BBDD</h2>
+        <h2>Pel·lícules</h2>
 
-        <ul class="list">
-          {{#each movies}}
-            <li class="list-item">
-              <strong>{{titol}}</strong><br>
-              <span class="muted">{{any}}</span>
-            </li>
-          {{/each}}
-        </ul>
-      </article>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Títol</th>
+              <th>Any</th>
+              <th>Actors</th>
+            </tr>
+          </thead>
 
-      <article class="card">
-        <h2>Clients</h2>
+      <tbody>
+        {{#each movies}}
+          <tr>
+            <td>{{Titol}}</td>
+            <td>{{Any}}</td>
+            <td>{{Actors}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
+        <br>
+        <h2>Categories</h2>
+        <table class="table">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nom</th>
+            </tr>
+          </thead>
+          <tbody>
+            {{#each categories}}
+              <tr>
+                <td>{{id}}</td>
+                <td>{{name}}</td>
+              </tr>
+            {{/each}}
+          </tbody>
+        </table>
 
-        <ul class="list">
-          {{#each customers}}
-            <li class="list-item">
-              {{nom}}
-            </li>
-          {{/each}}
-        </ul>
+
       </article>
     </section>
   </main>
